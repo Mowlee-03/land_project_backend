@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin{
+  id          Int @id @default(autoincrement())
+  username    String
+  email       String @unique
+  password    String
+  posts       Post[]
+  category    Category[]
+  District    District[]
+  token       String?
+  is_admin    Boolean @default(true)
+}
+
+model Post{
+  id          Int @id @default(autoincrement())
+  title        String
+  description  String
+  price       Int
+  image       String[]
+  location    String
+  bedroom    Int
+  bathroom    Int
+  area        String
+  type        String
+  district    District  @relation(fields: [district_name], references: [name],onDelete: Cascade)
+  district_name  String
+  category    Category  @relation(fields: [category_name], references: [name],onDelete: Cascade)
+  category_name  String
+  admin       Admin    @relation(fields: [adminId],references: [id])
+  adminId     Int
+  favourite   Favourite[] 
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime?    @updatedAt
+  isSold       Boolean   @default(false)
+}
+
+
+model User{
+  id          Int @id @default(autoincrement())
+  username    String
+  email       String @unique
+  password    String
+  phone_number  String
+  favourite   Favourite[]
+  token       String?
+  createdAt   DateTime @default(now())
+}
+
+model Favourite{
+  id          Int @id @default(autoincrement())
+  post        Post @relation(fields: [postId],references: [id],onDelete: Cascade)
+  postId      Int
+  user        User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  userId      Int
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  discription String
+  image       String
+  posts       Post[]   // Relation to posts, many posts can belong to one category
+  adminId     Int
+  admin       Admin    @relation(fields: [adminId], references: [id])
+}
+
+model District {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  posts     Post[]   // Relation to posts, many posts can belong to one district
+  adminId   Int
+  admin     Admin    @relation(fields: [adminId], references: [id])
+}
