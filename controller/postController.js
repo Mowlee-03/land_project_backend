@@ -1,6 +1,73 @@
 const { PrismaClient } = require("@prisma/client");
 const { verifyToken } = require("../utils/utility");
+const bucket = require("../auth/firebaseConfig");
 const prisma = new PrismaClient();
+
+
+const deleteImages = async (req, res) => {
+  try {
+    const { imageUrls } = req.body;
+
+
+    // Validate input
+    if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
+      return res.status(400).json({ status: 400, message: 'imageUrls must be a non-empty array' });
+    }
+    
+
+    // Helper function to extract file path from Firebase Storage URL
+    const getFilePathFromUrl = (url) => {
+      try {
+        const urlObj = new URL(url);
+        // Extract the path after the bucket name
+        const bucketPrefix = `/${bucket.name}/`;
+        const pathStart = urlObj.pathname.indexOf(bucketPrefix) + bucketPrefix.length;
+        const filePath = urlObj.pathname.substring(pathStart);
+        if (!filePath) throw new Error('Invalid Firebase Storage URL');
+        return decodeURIComponent(filePath);
+      } catch (error) {
+        throw new Error(`Failed to parse URL: ${error.message}`);
+      }
+    };
+
+    // Delete images from Firebase Storage
+    const deletionResults = await Promise.all(
+      imageUrls.map(async (url) => {
+        try {
+          const filePath = getFilePathFromUrl(url);
+          console.log('Deleting file:', filePath);
+          await bucket.file(filePath).delete();
+          return { url, status: 'success' };
+        } catch (error) {
+          return { url, status: 'failed', error: error.message };
+        }
+      })
+    );
+
+    const failedDeletions = deletionResults.filter((result) => result.status === 'failed');
+    if (failedDeletions.length > 0) {
+      return res.status(207).json({
+        status: 207,
+        message: 'Some images failed to delete',
+        results: deletionResults,
+      });
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: 'All images deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting images:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Failed to delete images',
+      details: error.message,
+    });
+  }
+};
+
+
 
 const createPost = async (req, res) => {
   try {
@@ -257,5 +324,6 @@ module.exports = {
     updatePost,
     deletePost,
     soldPropertytoggle,
-    Propertycounts
+    Propertycounts,
+    deleteImages
 };

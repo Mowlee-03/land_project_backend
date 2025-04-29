@@ -16,6 +16,6 @@ router.put('/updatepost/:postId',authenticate,postController.updatePost)
 router.delete('/delete/:postId',authenticate,postController.deletePost)
 router.post("/soldtoggle",authenticate,postController.soldPropertytoggle)
 
-
+router.post("/delete-images",authenticate,postController.deleteImages)
 
 module.exports = router;
