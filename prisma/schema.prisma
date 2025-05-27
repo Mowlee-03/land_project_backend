@@ -46,6 +46,16 @@ model Post{
   createdAt   DateTime   @default(now())
   updatedAt   DateTime?    @updatedAt
   isSold       Boolean   @default(false)
+  commission  Commission?
+}
+
+model Commission {
+  id        Int      @id @default(autoincrement())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int      @unique // one commission per post
+  amount    Int      // commission amount
+  notes     String?  // optional notes like payment status or buyer name
+  createdAt DateTime @default(now())
 }
 
 
