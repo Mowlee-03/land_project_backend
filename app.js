@@ -19,7 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(cors({
-  origin:["http://localhost:3000","http://localhost:3001","http://localhost:3002"],
+  origin:["http://localhost:3000","https://sundaramagency.vercel.app","https://sundaramagency-admin.vercel.app"],
   credentials:true
 }))
 app.use(logger('dev'));
