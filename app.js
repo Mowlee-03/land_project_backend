@@ -11,6 +11,7 @@ var postRouter= require("./routes/postRouter")
 var userRouter=require("./routes/userRouter")
 var favRouter=require("./routes/favouriteRouter")
 var fileUploadRouter=require("./routes/FileUploadRouter")
+var commissionRouter=require("./routes/commissionRoute")
 var app = express();
 
 // view engine setup
@@ -32,6 +33,7 @@ app.use('/post',postRouter)
 app.use('/user',userRouter)
 app.use('/fav',favRouter)
 app.use("/file",fileUploadRouter)
+app.use("/commission",commissionRouter)
 app.get("/",(req,res)=>{
   res.send("Hello")
 })
