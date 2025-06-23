@@ -23,8 +23,8 @@ const verifyToken = (token) => {
 
 const setAuthTokenCookie = (res, token) => {
   res.cookie('authToken', token, {
-      httpOnly: false, // Prevent access from JavaScript (mitigates XSS attacks)
-      secure: process.env.NODE_ENV==="production",
+      httpOnly: true, // Prevent access from JavaScript (mitigates XSS attacks)
+      secure: true,
       sameSite: 'None', // Protect against CSRF
       maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
   });
